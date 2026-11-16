@@ -2,9 +2,9 @@
 .vscode
 .env
 .env.*
-__pycache__
+__pycache__/
 *.py[cod]
-.venv
-venv
+.venv/
+venv/
 outputs/*
 data/MurrayLab_CTX_V01_E-160_N36_Mosaic.tif
