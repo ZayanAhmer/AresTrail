@@ -1,13 +1,11 @@
 from pathlib import Path
+import base64
 import subprocess
 import sys
 import threading
 from urllib.parse import urlencode
-import base64
-from flask import (
-    Flask, Response, redirect, request,
-    send_file, send_from_directory, url_for, render_template
-)
+
+from flask import Flask, Response, redirect, request, send_file, send_from_directory, url_for, render_template
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -155,12 +153,12 @@ def run_ares_trail():
                 text=True,
                 capture_output=True,
                 cwd=SCRIPT_PATH.parent,
-                timeout=105,
+                timeout=270,
                 check=False,
             )
         except subprocess.TimeoutExpired as exc:
             diagnostic = exc.stderr or exc.stdout or (
-                "The calculation exceeded the 30-minute time limit."
+                "The calculation exceeded the 270-second Vercel request limit."
             )
             if isinstance(diagnostic, bytes):
                 diagnostic = diagnostic.decode("utf-8", errors="replace")
@@ -193,32 +191,30 @@ def run_ares_trail():
                 latitude,
                 query,
             )
-    finally:
-        run_lock.release()
 
-    html = results_page.read_text(encoding="utf-8")
+        # Inline the generated maps in this same response. Container instances
+        # are stateless, so a later /results request may reach another instance.
+        html = results_page.read_text(encoding="utf-8")
 
-    for filename in ("AP1_Route_CTX.png", "AP1_Route_Map.png"):
-        image_path = OUTPUT_DIR / filename
+        for filename in ("AP1_Route_CTX.png", "AP1_Route_Map.png"):
+            image_path = OUTPUT_DIR / filename
+            if not image_path.is_file():
+                return page_error(
+                    f"The calculation finished, but {filename} was not created.",
+                    longitude=longitude,
+                    latitude=latitude,
+                    query=query,
+                )
 
-        if not image_path.is_file():
-            return page_error(
-                f"The calculation finished, but {filename} was not created.",
-                longitude=longitude,
-                latitude=latitude,
-                query=query
+            encoded_image = base64.b64encode(image_path.read_bytes()).decode("ascii")
+            html = html.replace(
+                f'src="/results/{filename}"',
+                f'src="data:image/png;base64,{encoded_image}"',
             )
 
-        encoded_image = base64.b64encode(
-            image_path.read_bytes()
-        ).decode("ascii")
-
-        html = html.replace(
-            f'src="/results/{filename}"',
-            f'src="data:image/png;base64,{encoded_image}"'
-        )
-
-    return Response(html, mimetype="text/html")
+        return Response(html, mimetype="text/html")
+    finally:
+        run_lock.release()
 
 
 @app.get("/results")

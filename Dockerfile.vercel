@@ -1,10 +1,10 @@
+
 FROM python:3.11-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MPLBACKEND=Agg
 
-# Native libraries required by GDAL/OGR/OSR.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gdal-bin \
@@ -17,8 +17,6 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Install app dependencies, then install Python GDAL bindings matching
-# the native GDAL version provided by Debian.
 RUN python -m pip install --upgrade pip setuptools wheel \
     && python -m pip install --no-cache-dir -r requirements.txt \
     && python -m pip install --no-cache-dir --no-build-isolation \
@@ -27,10 +25,7 @@ RUN python -m pip install --upgrade pip setuptools wheel \
 
 COPY . .
 
-# Vercel's container filesystem is read-only except for /tmp.
-# Keep the app's existing /app/outputs path, but redirect it to writable scratch space.
-RUN rm -rf /app/outputs && ln -s /tmp/arestrail/outputs /app/outputs
+RUN rm -rf /app/outputs && mkdir -p /tmp/arestrail/outputs \
+    && ln -s /tmp/arestrail/outputs /app/outputs
 
-# Vercel routes to port 80 by default. PORT can override it.
-# Keep one worker to limit memory use; the function has a short max request duration.
-CMD ["sh", "-c", "mkdir -p /tmp/arestrail/outputs && exec gunicorn --bind 0.0.0.0:${PORT:-80} --workers 1 --threads 1 --timeout 285 app:app"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-80} --workers 1 --threads 1 --timeout 285 app:app"]
