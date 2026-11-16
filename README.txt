@@ -1,9 +1,9 @@
 
-# RedLine
+# AresTrail
 
 ### A Martian pathfinder for geological exploration and rover route planning.
 
-RedLine is a Mars exploration application designed to help users identify geological features and calculate routes to potential exploration targets.
+AresTrail is a Mars exploration application designed to help users identify geological features and calculate routes to potential exploration targets.
 
 The project focuses on the AP-1 candidate landing region in northern Amazonis Planitia, Mars. It combines geological mapping, elevation data, terrain analysis, and pathfinding to make planetary exploration more accessible.
 
@@ -19,7 +19,7 @@ The project focuses on the AP-1 candidate landing region in northern Amazonis Pl
 
 ## Data Sources
 
-RedLine uses planetary datasets covering the AP-1 study region.
+AresTrail uses planetary datasets covering the AP-1 study region.
 
 | Dataset | Purpose |
 |---|---|
@@ -44,9 +44,9 @@ The route-planning terrain model currently uses a 125-meter grid. CTX imagery is
 ## Project Structure
 
 ```text
-RedLine/
+AresTrail/
 ├── app.py
-├── RedAtlasHighRes.py
+├── AresTrailFinal.py
 ├── environment.yml
 ├── README.md
 ├── .gitignore
@@ -71,7 +71,7 @@ RedLine/
 
 ## Local Installation
 
-RedLine uses a Conda environment to manage its scientific Python dependencies.
+AresTrail uses a Conda environment to manage its scientific Python dependencies.
 
 Create the environment:
 
@@ -82,7 +82,7 @@ conda env create -f environment.yml
 Activate it:
 
 ```bash
-conda activate redline
+conda activate AresTrail
 ```
 
 Run the Flask application:
@@ -115,7 +115,7 @@ Terrain movement cost increases with slope, encouraging routes across flatter te
 
 ## Project Status
 
-RedLine is an experimental planetary exploration prototype focused on geological target identification, terrain-based route planning, and visualization.
+AresTrail is an experimental planetary exploration prototype focused on geological target identification, terrain-based route planning, and visualization.
 
 The calculated routes are based on available elevation and slope data. They are not validated rover-driving instructions and do not account for every real-world rover constraint.
 
