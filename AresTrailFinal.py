@@ -36,7 +36,7 @@ geology_path = data_dir / 'map-AP1.gpkg'
 ctx_path = data_dir / 'CTX_AP1_Cropped_10m.tif'
 
 output_dir = project_dir / 'outputs'
-output_dir.mkdir(exist_ok=True)
+output_dir.mkdir(parents=True, exist_ok=True)
 
 cell_size = 125
 
@@ -1436,7 +1436,7 @@ def create_outputs_page(
                     </span>
                 </div>
                 <div class="detail">
-                    <span class="detail-label">Weighted Terrain Cost (Relatively safe path if similar in value to distance)</span>
+                    <span class="detail-label">Weighted Terrain Cost</span>
                     <span class="detail-value">
                         {total_cost:,.2f}
                     </span>
