@@ -310,7 +310,9 @@ def get_user_start(passable):
 
   return start
 
-
+# AI/SI integration: This function uses the
+# Google Gemini API to interpret natural-language
+# exploration requests and identify structured targets.
 def understand_user_request():
 
   user_request = input('What would you like to find on Mars? ')

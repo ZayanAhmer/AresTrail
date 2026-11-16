@@ -126,3 +126,27 @@ The current application is designed for local execution. A production cloud depl
 Developed as an independent planetary exploration and GIS project.
 
 Data products and imagery are credited to their respective providers and research teams.
+
+## AI/SI Use and Disclosure
+
+Artificial Intelligence (AI/SI) was used in AresTrail during both development and application operation. Its use is disclosed below.
+
+### AI-Assisted Development
+
+ChatGPT (OpenAI) was used as a development support tool throughout the project, particularly for debugging, troubleshooting, and resolving programming issues.
+
+AI assistance was also used specifically in developing and refining the final HTML interface and connecting the HTML frontend with the Python/Flask backend.
+
+AI-generated suggestions were reviewed, adapted, and tested by the project developer before being incorporated into the application.
+
+### AI/SI Integration Through an API
+
+AresTrail also incorporates AI functionality through the Google Gemini API, accessed from the Python backend using the Google Gen AI Python SDK.
+
+When a user enters a natural-language exploration request, the application sends the request to the Gemini API. The API interprets the requested geological target and returns structured information that AresTrail uses to identify relevant mapped features.
+
+The AI API assists with understanding user requests. The actual geological feature matching, terrain analysis, traversability calculations, A* pathfinding, route optimization, and map generation are performed by AresTrail's Python/GIS code using geospatial datasets.
+
+The API key is stored as a private environment variable and is not included in the public repository.
+
+This disclosure distinguishes AI-assisted development from the AI functionality integrated into the finished application.
