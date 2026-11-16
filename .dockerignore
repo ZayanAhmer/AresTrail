@@ -1,0 +1,9 @@
+.git
+.vscode
+.env
+.env.*
+__pycache__
+*.py[cod]
+.venv
+venv
+outputs/*
