@@ -684,7 +684,7 @@ def create_route_map(elevation,valid,locations,selected,path,start,goal):
   terrain = np.where(valid, elevation, np.nan)
 
   mars_cmap = LinearSegmentedColormap.from_list(
-      'red_line_mars',
+      'ares_trail_mars',
       [
           '#35251F',
           '#654033',
@@ -901,7 +901,7 @@ def create_ctx_map(locations, path, selected):
   ax.scatter(*route[0], color='#57D6C5', s=110, label='Start')
   ax.scatter(*route[-1], color='#32CD32', marker='*', s=220, label='Destination')
 
-  ax.set_title(f"RedLine | {selected['feature']} Exploration")
+  ax.set_title(f"AresTrail | {selected['feature']} Exploration")
   ax.set_xlabel('CTX pixel column')
   ax.set_ylabel('CTX pixel row')
   ax.legend()
@@ -950,7 +950,7 @@ def create_outputs_page(
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-        <title>AP-1 | RedLine</title>
+        <title>AP-1 | AresTrail</title>
         <style>
             * {{
                 box-sizing: border-box;
@@ -1106,7 +1106,7 @@ def create_outputs_page(
                     flex-direction: column;
                 }}
             }}
-            /* RedLine visual system: warm cream, rust accents, and soft glass. */
+            /* AresTrail visual system: warm cream, rust accents, and soft glass. */
             body {{
                 min-height: 100vh;
                 padding: clamp(16px, 3vw, 42px) 18px;
@@ -1335,9 +1335,9 @@ def create_outputs_page(
     <body>
     <main>
         <header>
-            <div class="brand">REDLINE &nbsp; / &nbsp; AP-1 EXPEDITION</div>
+            <div class="brand">AresTrail &nbsp; / &nbsp; AP-1 EXPEDITION</div>
             <h1>
-                <strong>RedLine</strong>
+                <strong>AresTrail</strong>
             </h1>
             <p class="subtitle">
                 Route results for your expedition across North Amazonis Planitia.
@@ -1478,7 +1478,7 @@ if __name__ == '__main__':
 
   print()
   print()
-  print('Welcome to RedLine, the martian pathfinder which turns natural-language objectives into algorithmic data and routes. Follow the instructions and watch the program build a path catered to your needs.')
+  print('Welcome to AresTrail, the martian pathfinder which turns natural-language objectives into algorithmic data and routes. Follow the instructions and watch the program build a path catered to your needs.')
   print('Currently, the map focuses on the promising future landing site of Northern Amazonis Planitia, specifically AP-1.')
   print()
   print()

@@ -18,8 +18,8 @@ MAX_QUERY_LENGTH = 400
 
 
 def locate_script():
-    """Find the supplied RedLine script without changing its contents."""
-    direct_script = PROJECT_DIR / "RedLineFinal.py"
+    """Find the supplied AresTrail script without changing its contents."""
+    direct_script = PROJECT_DIR / "AresTrailFinal.py"
     if direct_script.is_file():
         return direct_script
 
@@ -27,7 +27,7 @@ def locate_script():
     candidates = []
     for directory in search_dirs:
         if directory.is_dir():
-            candidates.extend(directory.glob("RedLineFinal*.py"))
+            candidates.extend(directory.glob("AresTrailFinal*.py"))
     return sorted(candidates)[0] if candidates else direct_script
 
 
@@ -49,7 +49,7 @@ run_lock = threading.Lock()
 def page_error(message, diagnostic=None, longitude=DEFAULT_LONGITUDE,
                latitude=DEFAULT_LATITUDE, query=""):
     if diagnostic:
-        app.logger.warning("RedLine calculation detail: %s", str(diagnostic)[-3500:])
+        app.logger.warning("AresTrail calculation detail: %s", str(diagnostic)[-3500:])
 
     params = {
         "error": message,
@@ -74,7 +74,7 @@ def mars_scene():
 
 
 @app.post("/run")
-def run_red_line():
+def run_ares_trail():
     longitude = request.form.get("longitude", "").strip()
     latitude = request.form.get("latitude", "").strip()
     query = request.form.get("query", "").strip()
@@ -126,7 +126,7 @@ def run_red_line():
 
     if not SCRIPT_PATH.is_file():
         return page_error(
-            "RedLineFinal.py was not found. Place it beside app.py and index.html.",
+            "AresTrailFinal.py was not found. Place it beside app.py and index.html.",
             longitude=longitude,
             latitude=latitude,
             query=query,
@@ -134,14 +134,14 @@ def run_red_line():
 
     if not run_lock.acquire(blocking=False):
         return page_error(
-            "A RedLine calculation is already running. Wait for it to finish before starting another.",
+            "A AresTrail calculation is already running. Wait for it to finish before starting another.",
             longitude=longitude,
             latitude=latitude,
             query=query,
         )
 
     try:
-        # RedLineFinal.py reads longitude, latitude, then the Gemini request
+        # AresTrailFinal.py reads longitude, latitude, then the Gemini request
         # from stdin. The browser form supplies those same inputs in that order.
         scripted_input = f"{longitude_value}\n{latitude_value}\n{query}\n"
 
@@ -174,7 +174,7 @@ def run_red_line():
                 "The Python script exited without an error message."
             )
             return page_error(
-                "RedLine could not complete this calculation. The diagnostic output is shown below.",
+                "AresTrail could not complete this calculation. The diagnostic output is shown below.",
                 diagnostic[-3500:],
                 longitude,
                 latitude,
@@ -210,6 +210,6 @@ def result_assets(filename):
 
 
 if __name__ == "__main__":
-    print("RedLine browser interface: http://127.0.0.1:5000")
+    print("AresTrail browser interface: http://127.0.0.1:5000")
     print("Keep this terminal window open while using the browser app.")
     app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
