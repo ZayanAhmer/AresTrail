@@ -1,10 +1,11 @@
-FROM python:3.12-slim-bookworm
+
+FROM python:3.11-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV MPLBACKEND=Agg
 
-# Install native geospatial libraries required by GDAL.
+# Install native geospatial libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gdal-bin \
@@ -17,11 +18,12 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Install Python dependencies, then match Python GDAL to system GDAL.
+# Install Python dependencies and matching GDAL bindings
 RUN python -m pip install --upgrade pip setuptools wheel \
     && python -m pip install --no-cache-dir -r requirements.txt \
     && python -m pip install --no-cache-dir --no-build-isolation \
-       "GDAL==$(gdal-config --version)"
+       "GDAL[numpy]==$(gdal-config --version)" \
+    && python -c "from osgeo import gdal, ogr, osr, gdal_array; import numpy; print('GDAL:', gdal.VersionInfo())"
 
 COPY . .
 
