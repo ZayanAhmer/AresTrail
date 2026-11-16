@@ -25,7 +25,10 @@ RUN python -m pip install --upgrade pip setuptools wheel \
 
 COPY . .
 
-RUN rm -rf /app/outputs && mkdir -p /tmp/arestrail/outputs \
+RUN rm -rf /app/outputs \
+    && mkdir -p /tmp/arestrail/outputs \
     && ln -s /tmp/arestrail/outputs /app/outputs
 
-CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-80} --workers 1 --threads 1 --timeout 285 app:app"]
+EXPOSE 80
+
+CMD ["sh", "-c", "mkdir -p /tmp/arestrail/outputs && exec gunicorn --bind 0.0.0.0:${PORT:-80} --workers 1 --threads 1 --timeout 285 app:app"]
