@@ -210,6 +210,6 @@ def result_assets(filename):
 
 
 if __name__ == "__main__":
-    print("AresTrail browser interface: http://127.0.0.1:5000")
+    print("AresTrail browser interface: http://127.0.0.1:8000")
     print("Keep this terminal window open while using the browser app.")
-    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
+    app.run(host="127.0.0.1", port=8000, debug=False)

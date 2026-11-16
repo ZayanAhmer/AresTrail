@@ -7,3 +7,4 @@ __pycache__
 .venv
 venv
 outputs/*
+data/MurrayLab_CTX_V01_E-160_N36_Mosaic.tif
