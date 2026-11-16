@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#191715">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <title>RedLine — Mars Pathfinder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #302722;
+      --muted: #766d66;
+      --cream: #f4eee7;
+      --rust: #a84f34;
+      --rust-deep: #733b2c;
+      --line: rgb(75 53 43 / 16%);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #d9b9a5;
+      color: var(--ink);
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+    }
+
+    .expedition {
+      position: fixed;
+      inset: 0;
+      isolation: isolate;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+      background: #d9b9a5;
+      outline: 0;
+    }
+
+    .terrain {
+      position: absolute;
+      z-index: -3;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 40%;
+    }
+
+    .atmosphere {
+      position: absolute;
+      z-index: -2;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgb(250 242 233 / 16%) 0%, transparent 24%, transparent 55%, rgb(38 23 17 / 31%) 100%),
+        linear-gradient(90deg, rgb(63 38 28 / 6%), transparent 25%, transparent 74%, rgb(50 31 23 / 13%));
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      right: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 30px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: #211d1a;
+      font-size: 13px;
+      font-weight: 420;
+      letter-spacing: 2.6px;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 16px;
+      height: 16px;
+      border: 1px solid rgb(33 29 26 / 76%);
+      opacity: .9;
+      transform: rotate(45deg);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      position: absolute;
+      content: "";
+      background: #211d1a;
+    }
+
+    .brand-mark::before {
+      top: 2px;
+      left: 7px;
+      width: 1px;
+      height: 10px;
+    }
+
+    .brand-mark::after {
+      top: 7px;
+      left: 2px;
+      width: 10px;
+      height: 1px;
+      opacity: .84;
+    }
+
+    .mission-tag {
+      color: rgb(57 39 31 / 72%);
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .center-title {
+      position: absolute;
+      top: 14%;
+      left: 50%;
+      width: min(860px, 86vw);
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .center-title .eyebrow {
+      display: inline-block;
+      margin: 0 0 17px;
+      padding: 5px 12px;
+      border: 1px solid rgb(87 58 42 / 13%);
+      border-radius: 999px;
+      background: rgb(250 247 241 / 67%);
+      color: #5a463b;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.25px;
+      text-transform: uppercase;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0;
+      color: #332720;
+      font-family: Georgia, "Palatino Linotype", serif;
+      font-size: clamp(37px, 5.2vw, 65px);
+      font-weight: 400;
+      letter-spacing: -2.5px;
+      line-height: .98;
+      text-shadow: 0 1px 16px rgb(247 235 224 / 38%);
+    }
+
+    .center-title .mission-description {
+      max-width: 760px;
+      margin: 12px 0 0;
+      margin-right: auto;
+      margin-left: auto;
+      color: rgb(47 34 27 / 88%);
+      font-size: clamp(13px, 1.3vw, 16px);
+      font-weight: 500;
+      letter-spacing: .05px;
+      line-height: 1.5;
+      text-shadow: 0 1px 14px rgb(255 245 234 / 80%);
+    }
+
+    .route-form { position: absolute; inset: 0; }
+
+    .coordinate-card {
+      position: absolute;
+      top: 35%;
+      right: 23px;
+      width: 286px;
+      overflow: hidden;
+      padding: 21px 21px 19px;
+      border: 1px solid rgb(255 255 255 / 64%);
+      border-radius: 20px;
+      background:
+        linear-gradient(145deg, rgb(255 255 255 / 43%), rgb(248 239 231 / 18%) 48%, rgb(234 214 199 / 30%)),
+        rgb(246 238 231 / 35%);
+      box-shadow:
+        0 22px 62px rgb(42 27 20 / 23%),
+        0 3px 12px rgb(255 255 255 / 22%) inset,
+        0 -1px 2px rgb(80 49 35 / 10%) inset;
+      backdrop-filter: blur(25px) saturate(165%);
+      -webkit-backdrop-filter: blur(25px) saturate(165%);
+    }
+
+    .coordinate-card::before {
+      position: absolute;
+      z-index: 0;
+      top: -92px;
+      right: -59px;
+      width: 260px;
+      height: 205px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgb(255 255 255 / 68%), rgb(255 255 255 / 0%) 69%);
+      content: "";
+      pointer-events: none;
+    }
+
+    .coordinate-card::after {
+      position: absolute;
+      z-index: 0;
+      inset: 1px;
+      border: 1px solid rgb(255 255 255 / 36%);
+      border-radius: 19px;
+      content: "";
+      pointer-events: none;
+    }
+
+    .coordinate-card h2,
+    .coordinate-card .card-note,
+    .coordinate-card .coordinate-row {
+      position: relative;
+      z-index: 1;
+    }
+
+    .coordinate-card h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: -.15px;
+    }
+
+    .coordinate-card .card-note {
+      margin: 4px 0 16px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .coordinate-field + .coordinate-field { margin-top: 12px; }
+
+    .coordinate-field label {
+      display: block;
+      margin-bottom: 5px;
+      color: #62554d;
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .coordinate-field input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid rgb(255 255 255 / 65%);
+      border-radius: 11px;
+      outline: none;
+      background:
+        linear-gradient(135deg, rgb(255 255 255 / 58%), rgb(255 249 243 / 23%)),
+        rgb(255 255 255 / 20%);
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      box-shadow:
+        0 5px 16px rgb(60 38 28 / 8%),
+        0 1px 0 rgb(255 255 255 / 77%) inset,
+        0 -1px 0 rgb(75 49 36 / 6%) inset;
+      backdrop-filter: blur(12px) saturate(145%);
+      -webkit-backdrop-filter: blur(12px) saturate(145%);
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    .coordinate-field input:focus {
+      border-color: rgb(255 255 255 / 90%);
+      background: rgb(255 251 246 / 68%);
+      box-shadow:
+        0 0 0 3px rgb(255 255 255 / 25%),
+        0 8px 24px rgb(55 34 25 / 12%),
+        0 1px 0 rgb(255 255 255 / 85%) inset;
+    }
+
+    .coordinate-input-wrap { position: relative; }
+
+    .coordinate-input-wrap input {
+      padding-right: 39px;
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    .coordinate-input-wrap input::-webkit-inner-spin-button,
+    .coordinate-input-wrap input::-webkit-outer-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+
+    .step-buttons {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      display: grid;
+      gap: 2px;
+      transform: translateY(-50%);
+    }
+
+    .step-button {
+      display: grid;
+      width: 25px;
+      height: 15px;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgb(255 255 255 / 40%);
+      border-radius: 5px;
+      background: rgb(255 255 255 / 36%);
+      color: #59473d;
+      cursor: pointer;
+      font: inherit;
+      font-size: 8px;
+      line-height: 1;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .step-button:hover,
+    .step-button:focus-visible {
+      outline: none;
+      background: rgb(255 255 255 / 82%);
+      color: #271f1a;
+    }
+
+    .coordinate-limits {
+      display: block;
+      margin-top: 4px;
+      color: #82766e;
+      font-size: 9px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .search-composer {
+      position: absolute;
+      top: 86%;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      width: min(650px, calc(100% - 360px));
+      min-width: 390px;
+      min-height: 66px;
+      padding: 7px 8px 7px 23px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgb(94 69 53 / 16%);
+      border-radius: 999px;
+      background: rgb(250 247 241 / 96%);
+      box-shadow: 0 12px 38px rgb(41 25 17 / 25%), 0 1px 0 rgb(255 255 255 / 72%) inset;
+    }
+
+    .search-icon {
+      flex: none;
+      width: 17px;
+      height: 17px;
+      margin-right: 13px;
+      border: 1.6px solid #78675c;
+      border-radius: 50%;
+      opacity: .78;
+    }
+
+    .search-icon::after {
+      display: block;
+      width: 7px;
+      height: 1.6px;
+      margin: 13px 0 0 12px;
+      transform: rotate(47deg);
+      transform-origin: left center;
+      background: #78675c;
+      content: "";
+    }
+
+    .search-composer input {
+      flex: 1;
+      min-width: 0;
+      height: 48px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #342922;
+      font: inherit;
+      font-size: clamp(14px, 1.35vw, 17px);
+    }
+
+    .search-composer input::placeholder {
+      color: #796f68;
+      opacity: 1;
+    }
+
+    .search-composer input:focus::placeholder { color: #9a8d84; }
+
+    .submit-button {
+      display: grid;
+      flex: none;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: #74402f;
+      color: #fff9f3;
+      cursor: pointer;
+      font: inherit;
+      font-size: 23px;
+      line-height: 1;
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    .submit-button:hover { transform: translateY(-1px); background: #512e24; }
+    .submit-button:disabled { cursor: wait; opacity: .7; transform: none; }
+
+    .error-card {
+      position: absolute;
+      bottom: 25px;
+      left: 27px;
+      width: min(540px, calc(100% - 54px));
+      padding: 14px 17px;
+      border-left: 3px solid #a64533;
+      background: rgb(249 238 230 / 94%);
+      box-shadow: 0 8px 28px rgb(35 21 15 / 16%);
+      color: #71392e;
+      font-size: 12px;
+      line-height: 1.5;
+      backdrop-filter: blur(10px);
+    }
+
+    .error-card details { margin-top: 7px; }
+    .error-card summary { cursor: pointer; font-size: 10px; font-weight: 700; }
+    .error-card pre {
+      max-height: 145px;
+      overflow: auto;
+      margin: 8px 0 0;
+      padding: 10px;
+      background: #342c28;
+      color: #f7eee4;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 10px;
+    }
+
+    .frame-footer {
+      position: absolute;
+      right: 28px;
+      bottom: 22px;
+      left: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgb(250 242 232 / 88%);
+      font-size: 9px;
+      font-weight: 650;
+      letter-spacing: 1.2px;
+      text-shadow: 0 1px 5px rgb(29 18 13 / 65%);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .frame-footer span:last-child { text-align: right; }
+    .frame-footer span:first-child { text-transform: none; }
+
+    @media (max-width: 820px) {
+      .expedition {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+      }
+
+      .topbar { padding: 19px 20px; }
+      .center-title { top: 13%; width: 90vw; }
+      .center-title .mission-description { max-width: 620px; font-size: 13px; }
+
+      .coordinate-card {
+        top: auto;
+        right: 16px;
+        bottom: 79px;
+        left: 16px;
+        width: auto;
+        padding: 14px 16px;
+      }
+
+      .coordinate-card .card-note { margin-bottom: 10px; }
+      .coordinate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .coordinate-field + .coordinate-field { margin-top: 0; }
+      .search-composer {
+        top: 65%;
+        width: calc(100% - 34px);
+        min-width: 0;
+        min-height: 60px;
+        padding-left: 18px;
+      }
+
+      .submit-button { width: 44px; height: 44px; }
+      .frame-footer { right: 18px; bottom: 17px; left: 18px; font-size: 8px; }
+      .error-card { bottom: 214px; left: 16px; width: calc(100% - 32px); }
+    }
+
+    @media (max-width: 430px) {
+      .mission-tag { font-size: 8px; letter-spacing: 1px; }
+      .brand { font-size: 11px; }
+      h1 { font-size: 42px; }
+      .center-title { top: 14%; }
+      .center-title .mission-description { font-size: 12px; }
+      .search-composer { top: 64%; }
+      .search-composer input { font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="expedition">
+    <img class="terrain" src="martian-sunset-blue.jpg" alt="">
+    <div class="atmosphere" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand" aria-label="RedLine">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>RedLine</span>
+      </div>
+      <span class="mission-tag">AP-1 · Mars Exploration</span>
+    </header>
+
+    <section class="center-title" aria-labelledby="page-title">
+      <p class="eyebrow">Expedition · AP-1</p>
+      <h1 id="page-title">RedLine</h1>
+      <p class="mission-description">Using open source data and AI to convert data-free goals into real mission routes across North Amazonis Planitia, specifically AP-1</p>
+    </section>
+
+    <form class="route-form" id="route-form" action="/run" method="post">
+      <aside class="coordinate-card" aria-labelledby="coordinates-title">
+        <h2 id="coordinates-title">Starting coordinates</h2>
+        <p class="card-note">Choose a rover start point within the mapped AP-1 area.</p>
+
+        <div class="coordinate-row">
+          <div class="coordinate-field">
+            <label for="longitude">Longitude · °E</label>
+            <div class="coordinate-input-wrap">
+              <input
+                id="longitude"
+                name="longitude"
+                type="number"
+                min="202.008"
+                max="202.163"
+                step="0.001"
+                value="202.0800"
+                required
+                inputmode="decimal"
+                aria-describedby="longitude-limits">
+              <div class="step-buttons" aria-label="Adjust longitude">
+                <button class="step-button" type="button" data-target="longitude" data-delta="0.001" aria-label="Increase longitude by 0.001 degrees">▲</button>
+                <button class="step-button" type="button" data-target="longitude" data-delta="-0.001" aria-label="Decrease longitude by 0.001 degrees">▼</button>
+              </div>
+            </div>
+            <small class="coordinate-limits" id="longitude-limits">202.008–202.163°E</small>
+          </div>
+          <div class="coordinate-field">
+            <label for="latitude">Latitude · °</label>
+            <div class="coordinate-input-wrap">
+              <input
+                id="latitude"
+                name="latitude"
+                type="number"
+                min="39.677"
+                max="39.937"
+                step="0.001"
+                value="39.8100"
+                required
+                inputmode="decimal"
+                aria-describedby="latitude-limits">
+              <div class="step-buttons" aria-label="Adjust latitude">
+                <button class="step-button" type="button" data-target="latitude" data-delta="0.001" aria-label="Increase latitude by 0.001 degrees">▲</button>
+                <button class="step-button" type="button" data-target="latitude" data-delta="-0.001" aria-label="Decrease latitude by 0.001 degrees">▼</button>
+              </div>
+            </div>
+            <small class="coordinate-limits" id="latitude-limits">39.677–39.937°</small>
+          </div>
+        </div>
+      </aside>
+
+      <div class="search-composer">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          id="query"
+          name="query"
+          type="text"
+          maxlength="400"
+          placeholder="What do you want to explore?"
+          aria-label="What do you want to explore?"
+          autocomplete="off"
+          required>
+        <button class="submit-button" id="submit-button" type="submit" aria-label="Find a route">
+          <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+    </form>
+
+    <section class="error-card" id="error-card" role="alert" aria-live="polite" hidden>
+      <strong id="error-message"></strong>
+    </section>
+
+    <footer class="frame-footer">
+      <span>Future Astronaut Pathfinder</span>
+      <span>HRSC terrain · 125 m grid</span>
+    </footer>
+  </main>
+
+  <script>
+    const form = document.getElementById("route-form");
+    const query = document.getElementById("query");
+    const button = document.getElementById("submit-button");
+    const longitude = document.getElementById("longitude");
+    const latitude = document.getElementById("latitude");
+    const errorCard = document.getElementById("error-card");
+    const errorMessage = document.getElementById("error-message");
+    const pageParams = new URLSearchParams(window.location.search);
+    const prompts = [
+      "What do you want to explore?",
+      "Example: I want to find signs of past water on Mars."
+    ];
+
+    let promptIndex = 0;
+    let promptPosition = 0;
+    let deleting = false;
+    let animationTimer;
+
+    function animatePrompt() {
+      if (query.value || document.activeElement === query) {
+        query.placeholder = "";
+        animationTimer = window.setTimeout(animatePrompt, 180);
+        return;
+      }
+
+      const prompt = prompts[promptIndex];
+      if (deleting) {
+        promptPosition = Math.max(0, promptPosition - 1);
+        query.placeholder = prompt.slice(0, promptPosition);
+        if (promptPosition === 0) {
+          deleting = false;
+          promptIndex = (promptIndex + 1) % prompts.length;
+          animationTimer = window.setTimeout(animatePrompt, 360);
+          return;
+        }
+      } else {
+        promptPosition = Math.min(prompt.length, promptPosition + 1);
+        query.placeholder = prompt.slice(0, promptPosition);
+        if (promptPosition === prompt.length) {
+          deleting = true;
+          animationTimer = window.setTimeout(animatePrompt, 1450);
+          return;
+        }
+      }
+      animationTimer = window.setTimeout(animatePrompt, deleting ? 34 : 68);
+    }
+
+    function clampCoordinate(input) {
+      if (input.value === "") return;
+      const number = Number(input.value);
+      if (!Number.isFinite(number)) return;
+      const minimum = Number(input.min);
+      const maximum = Number(input.max);
+      input.value = String(Math.min(maximum, Math.max(minimum, number)));
+    }
+
+    longitude.addEventListener("change", () => clampCoordinate(longitude));
+    latitude.addEventListener("change", () => clampCoordinate(latitude));
+
+    document.querySelectorAll(".step-button").forEach((stepButton) => {
+      stepButton.addEventListener("click", () => {
+        const input = document.getElementById(stepButton.dataset.target);
+        const current = input.value !== "" && Number.isFinite(Number(input.value))
+          ? Number(input.value)
+          : Number(input.defaultValue);
+        const steppedValue = Math.round(
+          (current + Number(stepButton.dataset.delta)) * 10000
+        ) / 10000;
+        const next = Math.min(
+          Number(input.max),
+          Math.max(Number(input.min), steppedValue)
+        );
+        input.value = next.toFixed(4);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    });
+
+    if (pageParams.has("longitude")) longitude.value = pageParams.get("longitude");
+    if (pageParams.has("latitude")) latitude.value = pageParams.get("latitude");
+    if (pageParams.has("query")) query.value = pageParams.get("query");
+    if (pageParams.has("error")) {
+      errorMessage.textContent = pageParams.get("error");
+      errorCard.hidden = false;
+    }
+
+    query.addEventListener("blur", () => {
+      if (!query.value) {
+        window.clearTimeout(animationTimer);
+        promptIndex = 0;
+        promptPosition = 0;
+        deleting = false;
+        query.placeholder = "";
+        animatePrompt();
+      }
+    });
+
+    form.addEventListener("submit", () => {
+      clampCoordinate(longitude);
+      clampCoordinate(latitude);
+      button.disabled = true;
+      button.innerHTML = '<span aria-hidden="true">…</span>';
+      button.setAttribute("aria-label", "Calculating route");
+    });
+
+    animatePrompt();
+  </script>
+</body>
+</html>

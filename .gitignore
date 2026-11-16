@@ -1,0 +1,29 @@
+# API keys and environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Local Python environments
+.venv/
+venv/
+asp/
+
+# VS Code workspace settings
+.vscode/
+
+# macOS
+.DS_Store
+
+# Generated results
+outputs/
+
+# Large Mars raster datasets
+data/*.tif
+data/*.tiff
+data/*.img
+data/*.IMG

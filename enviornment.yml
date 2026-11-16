@@ -1,0 +1,15 @@
+
+name: redline
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy
+  - gdal
+  - matplotlib
+  - flask
+  - python-dotenv
+  - pydantic
+  - pip
+  - pip:
+      - google-genai
