@@ -3,8 +3,11 @@ import subprocess
 import sys
 import threading
 from urllib.parse import urlencode
-
-from flask import Flask, redirect, request, send_file, send_from_directory, url_for, render_template
+import base64
+from flask import (
+    Flask, Response, redirect, request,
+    send_file, send_from_directory, url_for, render_template
+)
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -152,7 +155,7 @@ def run_ares_trail():
                 text=True,
                 capture_output=True,
                 cwd=SCRIPT_PATH.parent,
-                timeout=1800,
+                timeout=105,
                 check=False,
             )
         except subprocess.TimeoutExpired as exc:
@@ -193,7 +196,29 @@ def run_ares_trail():
     finally:
         run_lock.release()
 
-    return redirect(url_for("results"))
+    html = results_page.read_text(encoding="utf-8")
+
+    for filename in ("AP1_Route_CTX.png", "AP1_Route_Map.png"):
+        image_path = OUTPUT_DIR / filename
+
+        if not image_path.is_file():
+            return page_error(
+                f"The calculation finished, but {filename} was not created.",
+                longitude=longitude,
+                latitude=latitude,
+                query=query
+            )
+
+        encoded_image = base64.b64encode(
+            image_path.read_bytes()
+        ).decode("ascii")
+
+        html = html.replace(
+            f'src="/results/{filename}"',
+            f'src="data:image/png;base64,{encoded_image}"'
+        )
+
+    return Response(html, mimetype="text/html")
 
 
 @app.get("/results")

@@ -33,7 +33,7 @@ slope_path = data_dir / 'HRSC_AP1_Slope_Clipped_125m.tif'
 
 geology_path = data_dir / 'map-AP1.gpkg'
 
-ctx_path = data_dir / 'MurrayLab_CTX_V01_E-160_N36_Mosaic.tif'
+ctx_path = data_dir / 'CTX_AP1_Cropped_10m.tif'
 
 output_dir = project_dir / 'outputs'
 output_dir.mkdir(exist_ok=True)
